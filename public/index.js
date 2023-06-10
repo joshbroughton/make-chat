@@ -74,6 +74,10 @@ $(document).ready(() => {
     }
   });
 
+  socket.on('get channels', (channels) => {
+
+  })
+
   //Refresh the online user list
   socket.on('user has left', (onlineUsers) => {
     $('.users-online').empty();
