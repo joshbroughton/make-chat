@@ -3,10 +3,11 @@ $(document).ready(() => {
   const socket = io.connect();
 
   let currentUser;
+  socket.emit('get online users');
 
-  $('#create-user-btn').click((e)=>{
+  $('#create-user-btn').click((e) => {
     e.preventDefault();
-    if($('#username-input').val().length > 0){
+    if ($('#username-input').val().length > 0) {
       socket.emit('new user', $('#username-input').val());
       // Save the current user when created
       currentUser = $('#username-input').val();
@@ -20,13 +21,23 @@ $(document).ready(() => {
     // Get the message text value
     let message = $('#chat-input').val();
     // Make sure it's not empty
-    if(message.length > 0){
+    if (message.length > 0) {
       // Emit the message with the current user to the server
       socket.emit('new message', {
-        sender : currentUser,
-        message : message,
+        sender: currentUser,
+        message: message,
       });
       $('#chat-input').val("");
+    }
+  });
+
+  $('#new-channel-btn').click(() => {
+    let newChannel = $('#new-channel-input').val();
+
+    if (newChannel.length > 0) {
+      // Emit the new channel to the server
+      socket.emit('new channel', newChannel);
+      $('#new-channel-input').val("");
     }
   });
 
@@ -42,5 +53,21 @@ $(document).ready(() => {
         <p class="message-text">${data.message}</p>
       </div>
     `);
+  });
+
+  socket.on('get online users', (onlineUsers) => {
+    //You may have not have seen this for loop before. It's syntax is for(key in obj)
+    //Our usernames are keys in the object of onlineUsers.
+    for (username in onlineUsers) {
+      $('.users-online').append(`<div class="user-online">${username}</div>`);
+    }
+  });
+
+  //Refresh the online user list
+  socket.on('user has left', (onlineUsers) => {
+    $('.users-online').empty();
+    for (username in onlineUsers) {
+      $('.users-online').append(`<p>${username}</p>`);
+    }
   });
 })

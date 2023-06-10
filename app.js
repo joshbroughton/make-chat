@@ -5,9 +5,11 @@ const app = express();
 const server = require('http').Server(app);
 
 const io = require('socket.io')(server);
+
+let onlineUsers = {};
 io.on("connection", (socket) => {
   // This file will be read on new socket connections
-  require('./sockets/chat.js')(io, socket);
+  require('./sockets/chat.js')(io, socket, onlineUsers);
 })
 
 //Express View Engine for Handlebars
